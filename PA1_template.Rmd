@@ -68,7 +68,7 @@ The first part of this report will look at a distribution of the steps taken eac
 With that calculation the results can be examined in a histogram below to show visually this distribution of steps per day.
 
 ```{r}
-    #Create histogram for steps per day
+      png("Figures\\01_Hist_Steps_per_Day.png")
       Step1_Hist <- hist(Steps_per_Day
            , col="blue"
            , xlab = "Steps Per Day"
@@ -81,7 +81,10 @@ With that calculation the results can be examined in a histogram below to show v
       )
       axis(1, at = seq(0, 22500, by = 2500))
       axis(2, at = seq(0,10, by = 2))   
+      dev.off()
 ```    
+
+![01_Hist_Steps_per_Day](Figures/01_Hist_Steps_per_Day.png) 
 
 The median and mean of this distribution are calculated and shown below.
 
@@ -111,6 +114,7 @@ Below is the data preparation and graph to display the results of these acerages
     Intervals_and_Avg_Steps <- as.data.frame(cbind(Intervals,Steps_per_Interval))
     colnames(Intervals_and_Avg_Steps) <- c("interval", "avg_Steps")
 
+    png("Figures\\02_Avg_Interval_Steps.png")
     plot(Intervals_and_Avg_Steps$interval, Intervals_and_Avg_Steps$avg_Steps
          , col = "black"
          , type = "l"
@@ -122,7 +126,10 @@ Below is the data preparation and graph to display the results of these acerages
          #, xlim=c(min(Intervals_and_Avg_Steps$interval),max(Intervals_and_Avg_Steps$interval))
          #, ylim=c(0,10)
          )
+    dev.off()
 ```
+
+![02_Avg_Interval_Steps](Figures/02_Avg_Interval_Steps.png)
 
 The 5-minute interval containing the maximum number is found using the code below.
 
@@ -198,6 +205,7 @@ As you can see the lower values of the distribution have shifted causing a great
       Adj_Steps_per_Day <- tapply(Activity_Log_Adjusted$steps , Activity_Log_Adjusted$date, sum, na.rm = TRUE)
       
     #Histogram
+      png("Figures\\03_Hist_Adj_Steps_per_Day.png")
       Step3_Hist <- hist(Adj_Steps_per_Day
                          , col="blue"
                          , xlab = "Adjusted Steps Per Day"
@@ -210,11 +218,13 @@ As you can see the lower values of the distribution have shifted causing a great
       )
       axis(1, at = seq(0, 22500, by = 2500))
       axis(2, at = seq(0,10, by = 2))   
-      
+      dev.off()
       
       #get mean and median steps per day    
       c(Median = median(Adj_Steps_per_Day),Mean = mean(Adj_Steps_per_Day))
 ```
+
+![03_Hist_Adj_Steps_per_Day](Figures/03_Hist_Adj_Steps_per_Day.png)
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -254,6 +264,7 @@ additional data steps shown below were performed to prepare the weekend and week
 Below is the time series comparison of average intervals for weekend and weekday data.
 
 ```{r}    
+      png("Figures\\04_Weekend_Weekday_Comp.png")    
       par(mfcol = c(2,1))
       #weekend plot
       plot(Weekend_Intervals_and_Avg_Steps$interval, Weekend_Intervals_and_Avg_Steps$avg_Steps
@@ -262,7 +273,7 @@ Below is the time series comparison of average intervals for weekend and weekday
            , xlab = "interval"
            , ylab = "Number of Steps"
            , main = "Weekend"
-           , ylim=c(0,300)
+           , ylim=c(0,250)
       )
       
       #weekday plot
@@ -272,7 +283,9 @@ Below is the time series comparison of average intervals for weekend and weekday
            , xlab = "interval"
            , ylab = "Number of Steps"
            , main = "Weekday"
-           , ylim=c(0,300)
+           , ylim=c(0,250)
       )
+      dev.off()
 ```
 
+![04_Weekend_Weekday_Comp](Figures/04_Weekend_Weekday_Comp.png)
