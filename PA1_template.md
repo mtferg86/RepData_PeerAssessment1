@@ -29,7 +29,8 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 
 Below is the code to import the step activity data into R for processing
 
-```{r}
+
+```r
   #Import Data
     Activity_Log <- data.frame()
     Activity_Log <- read.csv("activity.csv", na.strings = "NA")
@@ -37,7 +38,8 @@ Below is the code to import the step activity data into R for processing
 
 In order to perform the analyses described in this report, the raw data fields provided needed to be transformed and additional fields were created from the data to supplement the analysis. The code for those transformations are shown below.
 
-```{r}
+
+```r
   #tranform data for analysis
     Activity_Log$date = as.Date(Activity_Log$date, format = "%Y-%m-%d")
     Activity_Log$steps = as.numeric(Activity_Log$steps)
@@ -60,14 +62,16 @@ In order to perform the analyses described in this report, the raw data fields p
 
 The first part of this report will look at a distribution of the steps taken each day. The code below calculates the total number of steps taken per day.
 
-```{r}
+
+```r
     #get total steps in each day
         Steps_per_Day <- tapply(Activity_Log$steps , Activity_Log$date, sum, na.rm = TRUE)
 ```
 
 With that calculation the results can be examined in a histogram below to show visually this distribution of steps per day.
 
-```{r}
+
+```r
       png("Figures\\01_Hist_Steps_per_Day.png")
       Step1_Hist <- hist(Steps_per_Day
            , col="blue"
@@ -82,15 +86,26 @@ With that calculation the results can be examined in a histogram below to show v
       axis(1, at = seq(0, 22500, by = 2500))
       axis(2, at = seq(0,10, by = 2))   
       dev.off()
-```    
+```
+
+```
+## RStudioGD 
+##         2
+```
 
 ![01_Hist_Steps_per_Day](Figures/01_Hist_Steps_per_Day.png) 
 
 The median and mean of this distribution are calculated and shown below.
 
-```{r}
+
+```r
     #get mean and median steps per day    
       c(Median = median(Steps_per_Day),Mean = mean(Steps_per_Day))
+```
+
+```
+##   Median     Mean 
+## 10395.00  9354.23
 ```
 
 ## What is the average daily activity pattern?
@@ -99,14 +114,16 @@ In addtion to the steps per day this report also looks at the distribution of ac
 
 Below is code that calculated the average number of steps in each interval period across all of the days included in the data set. 
 
-```{r}
+
+```r
     #get average number of steps in each 5 min segment  
     Steps_per_Interval <- as.data.frame(tapply(Activity_Log$steps , Activity_Log$interval, mean, na.rm = TRUE), colnames("Steps_per_Interval"))
 ```
 
 Below is the data preparation and graph to display the results of these acerages. This shows the average activity level at any point during the day from the data set provided.
 
-```{r}
+
+```r
     #get the unique list of intervals
     Intervals <- as.data.frame(unique(unlist(Activity_Log$interval_time)))
     
@@ -129,16 +146,27 @@ Below is the data preparation and graph to display the results of these acerages
     dev.off()
 ```
 
+```
+## RStudioGD 
+##         2
+```
+
 ![02_Avg_Interval_Steps](Figures/02_Avg_Interval_Steps.png)
 
 The 5-minute interval containing the maximum number is found using the code below.
 
-```{r}
+
+```r
     #Find the max average steps    
     Max_Avg_Steps <- max(Intervals_and_Avg_Steps$avg_Steps)
     
     #find interval with the maximum average steps
     subset(Intervals_and_Avg_Steps, Max_Avg_Steps==Intervals_and_Avg_Steps$avg_Steps, select = c(interval, avg_Steps))
+```
+
+```
+##                interval avg_Steps
+## 835 2015-07-20 08:35:00  206.1698
 ```
 
 ## Imputing missing values
@@ -149,7 +177,8 @@ In order to compensate for the skewed data set this report looks at the distrubu
 
 The code below splits the data set into "Complete"" and "NA" tables to begin this analysis.
 
-```{r}
+
+```r
     #Complete records
     Activity_Log_Complete <- Activity_Log[complete.cases(Activity_Log),]
     #records with NAs
@@ -157,9 +186,14 @@ The code below splits the data set into "Complete"" and "NA" tables to begin thi
     nrow(Activity_Log_NA)
 ```
 
+```
+## [1] 2304
+```
+
 Then the needed averages are taken from the "Complete" table and then applied to the "NA" table as shown below using SQL steps.
 
-```{r}
+
+```r
     library(sqldf)
     #Using SQL
       #create averages from complete data
@@ -189,7 +223,8 @@ Then the needed averages are taken from the "Complete" table and then applied to
 
 The 2 data sets are then combined to create an adjusted data set to compare to the raw data.
 
-```{r}
+
+```r
       #create adjusted data set including complete records and new NAs
       Activity_Log_Adjusted <- data.frame()
       Activity_Log_Adjusted <- rbind(Activity_Log_Complete,Activity_Log_NA)    
@@ -200,7 +235,8 @@ The same steps from earlier in the report are then followed with the adjusted da
 
 As you can see the lower values of the distribution have shifted causing a greater concentration of values in the middle of the range of total steps. The mean and median have increased as would be expected with replacing values of zero with an average value when calculating the total steps in a day.
 
-```{r}
+
+```r
     #get total steps in each day
       Adj_Steps_per_Day <- tapply(Activity_Log_Adjusted$steps , Activity_Log_Adjusted$date, sum, na.rm = TRUE)
       
@@ -219,9 +255,23 @@ As you can see the lower values of the distribution have shifted causing a great
       axis(1, at = seq(0, 22500, by = 2500))
       axis(2, at = seq(0,10, by = 2))   
       dev.off()
-      
+```
+
+```
+## RStudioGD 
+##         2
+```
+
+```r
       #get mean and median steps per day    
       c(Median = median(Adj_Steps_per_Day),Mean = mean(Adj_Steps_per_Day))
+```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
+
+```
+##   Median     Mean 
+## 11015.00 10821.21
 ```
 
 ![03_Hist_Adj_Steps_per_Day](Figures/03_Hist_Adj_Steps_per_Day.png)
@@ -230,14 +280,16 @@ As you can see the lower values of the distribution have shifted causing a great
 
 The report also looks at the weekend and weekday activity separately to look for any differences. In the initial data prep step a weekend flag was created (see the "Loading and preprocessing the data" section of this report). This flag was then used to separate weekend and weekday data into separate tables as shown below.
 
-```{r}
+
+```r
       Weekend_Data <- subset(Activity_Log_Adjusted, subset = Activity_Log_Adjusted$Weekend_Flag %in% c('Y'))
       Weekday_Data <- subset(Activity_Log_Adjusted, subset = Activity_Log_Adjusted$Weekend_Flag %in% c('N'))
 ```
 
 additional data steps shown below were performed to prepare the weekend and weekday data for comparison in a time series.
 
-```{r}
+
+```r
       #Weekend data prep for graph
           #get average number of steps in each 5 min segment  
           Weekend_Steps_per_Interval <- as.data.frame(tapply(Weekend_Data$steps , Weekend_Data$interval, mean, na.rm = TRUE), colnames("Steps_per_Interval"))
@@ -263,7 +315,8 @@ additional data steps shown below were performed to prepare the weekend and week
 
 Below is the time series comparison of average intervals for weekend and weekday data.
 
-```{r}    
+
+```r
       png("Figures\\04_Weekend_Weekday_Comp.png")    
       par(mfcol = c(2,1))
       #weekend plot
@@ -286,6 +339,11 @@ Below is the time series comparison of average intervals for weekend and weekday
            , ylim=c(0,250)
       )
       dev.off()
+```
+
+```
+## RStudioGD 
+##         2
 ```
 
 ![04_Weekend_Weekday_Comp](Figures/04_Weekend_Weekday_Comp.png)
